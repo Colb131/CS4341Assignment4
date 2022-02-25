@@ -199,7 +199,7 @@ public class QLearning {
         int i = state / mazeWidth;
         int j = state - i * mazeWidth;
 
-        return maze[i][j] == 'F';
+        return maze[i][j] > Integer.parseInt("0");
     }
 
     int[] possibleActionsFromState(int state) {
