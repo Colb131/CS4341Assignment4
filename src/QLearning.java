@@ -10,8 +10,8 @@ public class QLearning {
     private static double epsilon = 0.1; // Learning rate/e-greedy
     private static double gamma = 0.9; // Eagerness - 0 looks in the near future, 1 looks in the distant future
 
-    private final int mazeWidth = 6;
-    private final int mazeHeight = 11;
+    private static int mazeWidth = 0;
+    private static int mazeHeight = 0;
     private final int statesCount = mazeHeight * mazeWidth;
 
     private char[][] maze;  // Maze read from file
@@ -38,13 +38,13 @@ public class QLearning {
 
     public void init() {
         File file = new File("src/" + map_file);
-
+        String path = "src/" + map_file;
+        int [] dimensions = file_dimensions(path);
+        mazeHeight = dimensions[0];
+        mazeWidth = dimensions[1];
         R = new int[statesCount][statesCount];
         Q = new double[statesCount][statesCount];
         maze = new char[mazeHeight][mazeWidth];
-
-        //with open(file, 'r') as f:
-            //lines = f.readlines();
 
 
         try (FileInputStream fis = new FileInputStream(file)) {
@@ -136,6 +136,35 @@ public class QLearning {
             e.printStackTrace();
         }
     }
+    //This takes the file path and returns an array with [height, width]
+    public static int[] file_dimensions(String path){
+        int height = 1; //The height starts at 1 because the while loop checks every line after the first.
+        int width = 0;
+        try {
+            //Take path and make a file object.
+            File file = new File(path);
+            //Initialize scanner object and associate it with the file.
+            Scanner sc = new Scanner(file);
+            String temp = sc.nextLine();
+            //Loop through all the lines so long as there is a next line.
+            while(sc.hasNextLine()) {
+                sc.nextLine();
+                height++;
+            }
+            String[] line_split = temp.split("\t");
+            System.out.println("Map Height: " + height);
+            System.out.println("Map Height: " + line_split.length);
+            width = line_split.length;
+            sc.close();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+
+
+        return new int[]{height, width};
+    }
+
     //Set Q values to R values
     void initializeQ()
     {
