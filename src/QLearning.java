@@ -12,7 +12,7 @@ public class QLearning {
 
     private static int mazeWidth = 0;
     private static int mazeHeight = 0;
-    private final int statesCount = mazeHeight * mazeWidth;
+    private int statesCount = 0;
 
     private char[][] maze;  // Maze read from file
     private int[][] R;       // Reward lookup
@@ -42,6 +42,7 @@ public class QLearning {
         int [] dimensions = file_dimensions(path);
         mazeHeight = dimensions[0];
         mazeWidth = dimensions[1];
+        statesCount = mazeHeight * mazeWidth;
         R = new int[statesCount][statesCount];
         Q = new double[statesCount][statesCount];
         maze = new char[mazeHeight][mazeWidth];
@@ -153,7 +154,7 @@ public class QLearning {
             }
             String[] line_split = temp.split("\t");
             System.out.println("Map Height: " + height);
-            System.out.println("Map Height: " + line_split.length);
+            System.out.println("Map Width: " + line_split.length);
             width = line_split.length;
             sc.close();
         } catch (Exception e) {
@@ -194,17 +195,18 @@ public class QLearning {
     void calculateQ() {
         Random rand = new Random();
 
-        long start = System.nanoTime();
-        boolean learning = true;
-        while(learning) {
-            if(System.nanoTime() - start > learnTime) {
-                learning = false;
-            }
+//        long start = System.nanoTime();
+//        boolean learning = true;
+//        while(learning) {
+//            if(System.nanoTime() - start > learnTime) {
+//                learning = false;
+//            }
+        for (int i = 0; i < 1000; i++) {
             // Select random initial state
             int crtState = rand.nextInt(statesCount);
 
             while (!isFinalState(crtState)) {
-                int[] actionsFromCurrentState = possibleActionsFromState(crtState);
+                int[] actionsFromCurrentState = possibleActionsFromState(5);
 
                 // Pick a random action from the ones possible
                 int index = rand.nextInt(actionsFromCurrentState.length);
