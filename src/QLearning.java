@@ -14,7 +14,7 @@ public class QLearning {
     private static int mazeHeight = 0;
     private int statesCount = 0;
 
-    private char[][] maze;  // Maze read from file
+    private int[][] maze;  // Maze read from file
     private int[][] R;       // Reward lookup
     private double[][] Q;    // Q learning
 
@@ -45,7 +45,7 @@ public class QLearning {
         statesCount = mazeHeight * mazeWidth;
         R = new int[statesCount][statesCount];
         Q = new double[statesCount][statesCount];
-        maze = new char[mazeHeight][mazeWidth];
+        maze = new int[mazeHeight][mazeWidth];
 
 
         try (FileInputStream fis = new FileInputStream(file)) {
@@ -58,7 +58,7 @@ public class QLearning {
 
             // Read the maze from the input file
             while ((content = fis.read()) != -1) {
-                char c = (char) content;
+                int c = (int) content;
                 if (c != '0' && c != '5' && c != '3') {
                     continue;
                 }
@@ -84,15 +84,15 @@ public class QLearning {
                 }
 
                 // If not in final state or a wall try moving in all directions in the maze
-                if (maze[i][j] == '0') {
+                if (maze[i][j] == 0) {
 
                     // Try to move left in the maze
                     int goLeft = j - 1;
                     if (goLeft >= 0) {
                         int target = i * mazeWidth + goLeft;
-                        if (maze[i][goLeft] == '0') {
+                        if (maze[i][goLeft] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[i][goLeft] != '0') {
+                        } else if (maze[i][goLeft] != 0) {
                             R[k][target] = maze[i][j];
                         }
                     }
@@ -101,9 +101,9 @@ public class QLearning {
                     int goRight = j + 1;
                     if (goRight < mazeWidth) {
                         int target = i * mazeWidth + goRight;
-                        if (maze[i][goRight] == '0') {
+                        if (maze[i][goRight] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[i][goRight] != '0') {
+                        } else if (maze[i][goRight] != 0) {
                             R[k][target] = maze[i][j];
                         }
                     }
@@ -112,9 +112,9 @@ public class QLearning {
                     int goUp = i - 1;
                     if (goUp >= 0) {
                         int target = goUp * mazeWidth + j;
-                        if (maze[goUp][j] == '0') {
+                        if (maze[goUp][j] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[goUp][j] != '0') {
+                        } else if (maze[goUp][j] != 0) {
                             R[k][target] = maze[i][j];
                         }
                     }
@@ -123,9 +123,9 @@ public class QLearning {
                     int goDown = i + 1;
                     if (goDown < mazeHeight) {
                         int target = goDown * mazeWidth + j;
-                        if (maze[goDown][j] == '0') {
+                        if (maze[goDown][j] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[goDown][j] != '0') {
+                        } else if (maze[goDown][j] != 0) {
                             R[k][target] = maze[i][j];
                         }
                     }
@@ -206,7 +206,8 @@ public class QLearning {
             int crtState = rand.nextInt(statesCount);
 
             while (!isFinalState(crtState)) {
-                int[] actionsFromCurrentState = possibleActionsFromState(5);
+                int[] actionsFromCurrentState = possibleActionsFromState(5); //changed to 5 to try to figure out why the state that is getting is erroring
+                //it doesnt error on 5
 
                 // Pick a random action from the ones possible
                 int index = rand.nextInt(actionsFromCurrentState.length);
