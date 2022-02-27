@@ -37,8 +37,8 @@ public class QLearning {
     }
 
     public void init() {
-        File file = new File("src/" + map_file);
-        String path = "src/" + map_file;
+        String path = "src/sample2.txt";
+        System.out.println(path);
         int [] dimensions = file_dimensions(path);
         grid_height = dimensions[0];
         grid_width = dimensions[1];
@@ -46,9 +46,7 @@ public class QLearning {
         R = new int[statesCount][statesCount];
         Q = new double[statesCount][statesCount];
         gridworld = new int[grid_height][grid_width];
-
-
-        try (FileInputStream fis = new FileInputStream(file)) {
+        gridworld = fileTo2DArray(path, grid_height, grid_width);
 
             int i = 0;
             int j = 0;
@@ -133,10 +131,8 @@ public class QLearning {
             }
             initializeQ();
             printR(R);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
+
     //This takes the file path and returns an array with [height, width]
     public static int[] file_dimensions(String path){
         int height = 1; //The height starts at 1 because the while loop checks every line after the first.
@@ -263,6 +259,44 @@ public class QLearning {
         for (int i = 0; i < statesCount; i++) {
             System.out.println("From state " + i + " goto state " + getPolicyFromState(i));
         }
+    }
+
+    public static int[][] fileTo2DArray(String path, int height, int width){
+        int index = 1; //The height starts at 1 because the while loop checks every line after the first.
+
+        int[][] gridArray = new int[height][width];
+        try {
+            //Take path and make a file object.
+            File file = new File(path);
+            //Initialize scanner object and associate it with the file.
+            Scanner sc = new Scanner(file);
+            String temp = sc.nextLine();
+            String[] line_split = temp.split("\t");
+            System.out.println("This is temp: " + temp);
+            for (int i = 0; i < line_split.length; i++){
+                gridArray[0][i] = Integer.parseInt(line_split[i]);
+            }
+            //Loop through all the lines so long as there is a next line.
+            while(index < height + 1) {
+                temp = sc.nextLine();
+                line_split = temp.split("\t");
+                for (int i = 0; i < line_split.length; i++){
+                    System.out.print(line_split[i]);
+                    gridArray[index][i] = Integer.parseInt(line_split[i]);
+                }
+                index++;
+            }
+            System.out.println("Map Height: " + height);
+            System.out.println("Map Height: " + line_split.length);
+            sc.close();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        System.out.println("=========================================================");
+        System.out.println(Arrays.deepToString(gridArray));
+
+        return gridArray;
     }
 
     int getPolicyFromState(int state) {
