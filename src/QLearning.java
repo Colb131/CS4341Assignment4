@@ -10,11 +10,11 @@ public class QLearning {
     private static double epsilon = 0.1; // Learning rate/e-greedy
     private static double gamma = 0.9; // Eagerness - 0 looks in the near future, 1 looks in the distant future
 
-    private static int mazeWidth = 0;
-    private static int mazeHeight = 0;
+    private static int grid_width = 1;
+    private static int grid_height = 1;
     private int statesCount = 0;
 
-    private int[][] maze;  // Maze read from file
+    private int[][] gridworld;  // Maze read from file
     private int[][] R;       // Reward lookup
     private double[][] Q;    // Q learning
 
@@ -40,12 +40,12 @@ public class QLearning {
         File file = new File("src/" + map_file);
         String path = "src/" + map_file;
         int [] dimensions = file_dimensions(path);
-        mazeHeight = dimensions[0];
-        mazeWidth = dimensions[1];
-        statesCount = mazeHeight * mazeWidth;
+        grid_height = dimensions[0];
+        grid_width = dimensions[1];
+        statesCount = grid_height * grid_width;
         R = new int[statesCount][statesCount];
         Q = new double[statesCount][statesCount];
-        maze = new int[mazeHeight][mazeWidth];
+        gridworld = new int[grid_height][grid_width];
 
 
         try (FileInputStream fis = new FileInputStream(file)) {
@@ -58,13 +58,13 @@ public class QLearning {
 
             // Read the maze from the input file
             while ((content = fis.read()) != -1) {
-                int c = (int) content;
+                int c = (char) content;
                 if (c != '0' && c != '5' && c != '3') {
                     continue;
                 }
-                maze[i][j] = c;
+                gridworld[i][j] = c;
                 j++;
-                if (j == mazeWidth) {
+                if (j == grid_width) {
                     j = 0;
                     i++;
                 }
@@ -75,8 +75,8 @@ public class QLearning {
 
                 // We will navigate with i and j through the maze, so we need
                 // to translate k into i and j
-                i = k / mazeWidth;
-                j = k - i * mazeWidth;
+                i = k / grid_width;
+                j = k - i * grid_width;
 
                 // Fill in the reward matrix with -1
                 for (int s = 0; s < statesCount; s++) {
@@ -84,49 +84,49 @@ public class QLearning {
                 }
 
                 // If not in final state or a wall try moving in all directions in the maze
-                if (maze[i][j] == 0) {
+                if (gridworld[i][j] == 0) {
 
                     // Try to move left in the maze
                     int goLeft = j - 1;
                     if (goLeft >= 0) {
-                        int target = i * mazeWidth + goLeft;
-                        if (maze[i][goLeft] == 0) {
+                        int target = i * grid_width + goLeft;
+                        if (gridworld[i][goLeft] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[i][goLeft] != 0) {
-                            R[k][target] = maze[i][j];
+                        } else if (gridworld[i][goLeft] != 0) {
+                            R[k][target] = gridworld[i][j];
                         }
                     }
 
                     // Try to move right in the maze
                     int goRight = j + 1;
-                    if (goRight < mazeWidth) {
-                        int target = i * mazeWidth + goRight;
-                        if (maze[i][goRight] == 0) {
+                    if (goRight < grid_width) {
+                        int target = i * grid_width + goRight;
+                        if (gridworld[i][goRight] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[i][goRight] != 0) {
-                            R[k][target] = maze[i][j];
+                        } else if (gridworld[i][goRight] != 0) {
+                            R[k][target] = gridworld[i][j];
                         }
                     }
 
                     // Try to move up in the maze
                     int goUp = i - 1;
                     if (goUp >= 0) {
-                        int target = goUp * mazeWidth + j;
-                        if (maze[goUp][j] == 0) {
+                        int target = goUp * grid_width + j;
+                        if (gridworld[goUp][j] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[goUp][j] != 0) {
-                            R[k][target] = maze[i][j];
+                        } else if (gridworld[goUp][j] != 0) {
+                            R[k][target] = gridworld[i][j];
                         }
                     }
 
                     // Try to move down in the maze
                     int goDown = i + 1;
-                    if (goDown < mazeHeight) {
-                        int target = goDown * mazeWidth + j;
-                        if (maze[goDown][j] == 0) {
+                    if (goDown < grid_height) {
+                        int target = goDown * grid_width + j;
+                        if (gridworld[goDown][j] == 0) {
                             R[k][target] = 0;
-                        } else if (maze[goDown][j] != 0) {
-                            R[k][target] = maze[i][j];
+                        } else if (gridworld[goDown][j] != 0) {
+                            R[k][target] = gridworld[i][j];
                         }
                     }
                 }
@@ -228,10 +228,10 @@ public class QLearning {
     }
 
     boolean isFinalState(int state) {
-        int i = state / mazeWidth;
-        int j = state - i * mazeWidth;
+        int i = state / grid_width;
+        int j = state - i * grid_width;
 
-        return maze[i][j] > Integer.parseInt("0");
+        return gridworld[i][j] > Integer.parseInt("0");
     }
 
     int[] possibleActionsFromState(int state) {
