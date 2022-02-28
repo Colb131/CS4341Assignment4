@@ -38,7 +38,7 @@ public class QLearning {
     }
 
     public void init() {
-        String path = "src/sample2.txt";
+        String path = "src/sample.txt";
         System.out.println(path);
         int [] dimensions = file_dimensions(path);
         grid_height = dimensions[0];
@@ -182,10 +182,11 @@ public class QLearning {
 //        long start = System.nanoTime();
 //        boolean learning = true;
 //        while(learning) {
-//            if(System.nanoTime() - start > learnTime) {
+//            if (System.nanoTime() - start > learnTime) {
 //                learning = false;
 //            }
-        for (int i = 0; i < 1000; i++) {
+//        }
+        for (int i = 0; i < 10000; i++) {
             // Select random initial state
             int crtState = rand.nextInt(statesCount);
 
@@ -212,7 +213,7 @@ public class QLearning {
         int i = state / grid_width;
         int j = state - i * grid_width;
 
-        return gridworld[i][j] > 0;
+        return gridworld[i][j] != 0;
     }
 
     int[] possibleActionsFromState(int state) {
@@ -229,7 +230,7 @@ public class QLearning {
     double maxQ(int nextState) {
         int[] actionsFromState = possibleActionsFromState(nextState);
         //the learning rate and eagerness will keep the W value above the lowest reward
-        double maxValue = 10;
+        double maxValue = -10;
         for (int nextAction : actionsFromState) {
             double value = Q[nextState][nextAction];
 
