@@ -1,7 +1,5 @@
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.*;
-import java.io.IOException;
 
 public class QLearning {
 
@@ -27,9 +25,9 @@ public class QLearning {
         //How long to learn (in seconds)
         learnTime = Float.parseFloat(args[1]) * 1000000000; //convert input into nano seconds
         //The probability of moving in the desired direction upon taking an action (0.8 recreates behavior from value iteration example).
-        //epsilon = Double.parseDouble(args[2]);
+        epsilon = Double.parseDouble(args[2]);
         //The constant reward for each action
-        //gamma = Double.parseDouble(args[3]);
+        gamma = Double.parseDouble(args[3]) * -1;
 
         ql.init();
         ql.calculateQ();
@@ -38,7 +36,7 @@ public class QLearning {
     }
 
     public void init() {
-        String path = "src/sample.txt";
+        String path = "src/" + map_file;
         System.out.println(path);
         int [] dimensions = file_dimensions(path);
         grid_height = dimensions[0];
@@ -179,15 +177,12 @@ public class QLearning {
     void calculateQ() {
         Random rand = new Random();
 
-//        long start = System.nanoTime();
-//        boolean learning = true;
-//        while(learning) {
-//            if (System.nanoTime() - start > learnTime) {
-//                learning = false;
-//            }
-//        }
-        for (int i = 0; i < 10000; i++) {
-            // Select random initial state
+        long start = System.nanoTime();
+        boolean learning = true;
+        while(learning) {
+            if (System.nanoTime() - start > learnTime) {
+                learning = false;
+            }
             int crtState = rand.nextInt(statesCount);
 
             while (!isFinalState(crtState)) {
