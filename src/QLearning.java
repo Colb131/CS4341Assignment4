@@ -8,7 +8,7 @@ public class QLearning {
     private static float learnTime;
     private static String map_file;
     private static double epsilon = 0.1; // Learning rate/e-greedy
-    private static double gamma = 0.9; // Eagerness - 0 looks in the near future, 1 looks in the distant future
+    private static double gamma = 0.8; // Eagerness - 0 looks in the near future, 1 looks in the distant future
 
     private static int grid_width = 1;
     private static int grid_height = 1;
@@ -102,7 +102,8 @@ public class QLearning {
                         if (gridworld[i][goRight] == 0) {
                             R[k][target] = 0;
                         } else if (gridworld[i][goRight] != 0) {
-                            R[k][target] = gridworld[i][j];
+                            int temp = gridworld[i][goRight];
+                            R[k][target] = temp;
                         }
                     }
 
@@ -113,7 +114,8 @@ public class QLearning {
                         if (gridworld[goUp][j] == 0) {
                             R[k][target] = 0;
                         } else if (gridworld[goUp][j] != 0) {
-                            R[k][target] = gridworld[i][j];
+                            int temp = gridworld[goUp][j];
+                            R[k][target] = temp;
                         }
                     }
 
@@ -124,7 +126,8 @@ public class QLearning {
                         if (gridworld[goDown][j] == 0) {
                             R[k][target] = 0;
                         } else if (gridworld[goDown][j] != 0) {
-                            R[k][target] = gridworld[i][j];
+                            int temp = gridworld[goDown][j];
+                            R[k][target] = temp;
                         }
                     }
                 }
@@ -275,6 +278,7 @@ public class QLearning {
             System.out.println("This is temp: " + temp);
             for (int i = 0; i < line_split.length; i++){
                 gridArray[0][i] = Integer.parseInt(line_split[i]);
+                arrayList.add(Integer.parseInt(line_split[i]));
             }
             //Loop through all the lines so long as there is a next line.
             while(index < height + 1) {
@@ -283,6 +287,7 @@ public class QLearning {
                 for (int i = 0; i < line_split.length; i++){
                     System.out.print(line_split[i]);
                     gridArray[index][i] = Integer.parseInt(line_split[i]);
+                    arrayList.add(Integer.parseInt(line_split[i]));
                 }
                 index++;
             }
