@@ -253,7 +253,6 @@ public class QLearning {
             Scanner sc = new Scanner(file);
             String temp = sc.nextLine();
             String[] line_split = temp.split("\t");
-            System.out.println("This is temp: " + temp);
             for (int i = 0; i < line_split.length; i++){
                 gridArray[0][i] = Integer.parseInt(line_split[i]);
                 arrayList.add(Integer.parseInt(line_split[i]));
@@ -263,7 +262,6 @@ public class QLearning {
                 temp = sc.nextLine();
                 line_split = temp.split("\t");
                 for (int i = 0; i < line_split.length; i++){
-                    System.out.print(line_split[i]);
                     gridArray[index][i] = Integer.parseInt(line_split[i]);
                     arrayList.add(Integer.parseInt(line_split[i]));
                 }
@@ -275,9 +273,6 @@ public class QLearning {
         } catch (Exception e) {
             e.getStackTrace();
         }
-
-        System.out.println("=========================================================");
-        System.out.println(Arrays.deepToString(gridArray));
 
         return gridArray;
     }
