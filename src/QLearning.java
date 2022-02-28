@@ -15,6 +15,7 @@ public class QLearning {
     private int statesCount = 0;
 
     private int[][] gridworld;  // Maze read from file
+    private static ArrayList<Integer> arrayList = new ArrayList<>();
     private int[][] R;       // Reward lookup
     private double[][] Q;    // Q learning
 
@@ -26,9 +27,9 @@ public class QLearning {
         //How long to learn (in seconds)
         learnTime = Float.parseFloat(args[1]) * 1000000000; //convert input into nano seconds
         //The probability of moving in the desired direction upon taking an action (0.8 recreates behavior from value iteration example).
-        epsilon = Double.parseDouble(args[2]);
+        //epsilon = Double.parseDouble(args[2]);
         //The constant reward for each action
-        gamma = Double.parseDouble(args[3]);
+        //gamma = Double.parseDouble(args[3]);
 
         ql.init();
         ql.calculateQ();
@@ -48,93 +49,77 @@ public class QLearning {
         gridworld = new int[grid_height][grid_width];
         gridworld = fileTo2DArray(path, grid_height, grid_width);
 
-            int i = 0;
-            int j = 0;
 
-            int content;
+        int i = 0;
+        int j = 0;
 
+        // We will navigate through the reward matrix R using k index
+        for (int k = 0; k < statesCount; k++) {
 
-            // Read the maze from the input file
-            while ((content = fis.read()) != -1) {
-                int c = (char) content;
-                if (c != '0' && c != '5' && c != '3') {
-                    continue;
-                }
-                gridworld[i][j] = c;
-                j++;
-                if (j == grid_width) {
-                    j = 0;
-                    i++;
-                }
+            // We will navigate with i and j through the maze, so we need
+            // to translate k into i and j
+            i = k / grid_width;
+            j = k - i * grid_width;
+
+            // Fill in the reward matrix with -1
+            for (int s = 0; s < statesCount; s++) {
+                R[k][s] = -1;
             }
 
-            // We will navigate through the reward matrix R using k index
-            for (int k = 0; k < statesCount; k++) {
-
-                // We will navigate with i and j through the maze, so we need
-                // to translate k into i and j
-                i = k / grid_width;
-                j = k - i * grid_width;
-
-                // Fill in the reward matrix with -1
-                for (int s = 0; s < statesCount; s++) {
-                    R[k][s] = -1;
+            // If not in final state or a wall try moving in all directions in the maze
+            if (gridworld[i][j] == 0)  {
+                // Try to move left in the maze
+                int goLeft = j - 1;
+                if (goLeft >= 0) {
+                    int target = i * grid_width + goLeft;
+                    if (gridworld[i][goLeft] == 0) {
+                        R[k][target] = 0;
+                    } else if (gridworld[i][goLeft] != 0) {
+                        int temp = gridworld[i][goLeft];
+                        R[k][target] = temp;
+                    }
                 }
 
-                // If not in final state or a wall try moving in all directions in the maze
-                if (gridworld[i][j] == 0) {
-
-                    // Try to move left in the maze
-                    int goLeft = j - 1;
-                    if (goLeft >= 0) {
-                        int target = i * grid_width + goLeft;
-                        if (gridworld[i][goLeft] == 0) {
-                            R[k][target] = 0;
-                        } else if (gridworld[i][goLeft] != 0) {
-                            R[k][target] = gridworld[i][j];
-                        }
+                // Try to move right in the maze
+                int goRight = j + 1;
+                if (goRight < grid_width) {
+                    int target = i * grid_width + goRight;
+                    if (gridworld[i][goRight] == 0) {
+                        R[k][target] = 0;
+                    } else if (gridworld[i][goRight] != 0) {
+                        int temp = gridworld[i][goRight];
+                        R[k][target] = temp;
                     }
+                }
 
-                    // Try to move right in the maze
-                    int goRight = j + 1;
-                    if (goRight < grid_width) {
-                        int target = i * grid_width + goRight;
-                        if (gridworld[i][goRight] == 0) {
-                            R[k][target] = 0;
-                        } else if (gridworld[i][goRight] != 0) {
-                            int temp = gridworld[i][goRight];
-                            R[k][target] = temp;
-                        }
+                // Try to move up in the maze
+                int goUp = i - 1;
+                if (goUp >= 0) {
+                    int target = goUp * grid_width + j;
+                    if (gridworld[goUp][j] == 0) {
+                        R[k][target] = 0;
+                    } else if (gridworld[goUp][j] != 0) {
+                        int temp = gridworld[goUp][j];
+                        R[k][target] = temp;
                     }
+                }
 
-                    // Try to move up in the maze
-                    int goUp = i - 1;
-                    if (goUp >= 0) {
-                        int target = goUp * grid_width + j;
-                        if (gridworld[goUp][j] == 0) {
-                            R[k][target] = 0;
-                        } else if (gridworld[goUp][j] != 0) {
-                            int temp = gridworld[goUp][j];
-                            R[k][target] = temp;
-                        }
-                    }
-
-                    // Try to move down in the maze
-                    int goDown = i + 1;
-                    if (goDown < grid_height) {
-                        int target = goDown * grid_width + j;
-                        if (gridworld[goDown][j] == 0) {
-                            R[k][target] = 0;
-                        } else if (gridworld[goDown][j] != 0) {
-                            int temp = gridworld[goDown][j];
-                            R[k][target] = temp;
-                        }
+                // Try to move down in the maze
+                int goDown = i + 1;
+                if (goDown < grid_height) {
+                    int target = goDown * grid_width + j;
+                    if (gridworld[goDown][j] == 0) {
+                        R[k][target] = 0;
+                    } else if (gridworld[goDown][j] != 0) {
+                        int temp = gridworld[goDown][j];
+                        R[k][target] = temp;
                     }
                 }
             }
-            initializeQ();
-            printR(R);
         }
+        initializeQ();
+        printR(R);
+    }
 
     //This takes the file path and returns an array with [height, width]
     public static int[] file_dimensions(String path){
@@ -170,7 +155,7 @@ public class QLearning {
     {
         for (int i = 0; i < statesCount; i++){
             for(int j = 0; j < statesCount; j++){
-                Q[i][j] = (double)R[i][j];
+                Q[i][j] = R[i][j];
             }
         }
     }
@@ -205,9 +190,7 @@ public class QLearning {
             int crtState = rand.nextInt(statesCount);
 
             while (!isFinalState(crtState)) {
-                int[] actionsFromCurrentState = possibleActionsFromState(5); //changed to 5 to try to figure out why the state that is getting is erroring
-                //it doesnt error on 5
-
+                int[] actionsFromCurrentState = possibleActionsFromState(crtState);
                 // Pick a random action from the ones possible
                 int index = rand.nextInt(actionsFromCurrentState.length);
                 int nextState = actionsFromCurrentState[index];
@@ -217,12 +200,11 @@ public class QLearning {
                 double maxQ = maxQ(nextState);
                 int r = R[crtState][nextState];
 
-                double value = q + epsilon * (r + gamma * maxQ - q);
+                double value = q + (epsilon * (r + gamma * maxQ - q));
                 Q[crtState][nextState] = value;
 
                 crtState = nextState;
             }
-
         }
     }
 
@@ -230,7 +212,7 @@ public class QLearning {
         int i = state / grid_width;
         int j = state - i * grid_width;
 
-        return gridworld[i][j] > Integer.parseInt("0");
+        return gridworld[i][j] > 0;
     }
 
     int[] possibleActionsFromState(int state) {
@@ -247,7 +229,7 @@ public class QLearning {
     double maxQ(int nextState) {
         int[] actionsFromState = possibleActionsFromState(nextState);
         //the learning rate and eagerness will keep the W value above the lowest reward
-        double maxValue = -10;
+        double maxValue = 10;
         for (int nextAction : actionsFromState) {
             double value = Q[nextState][nextAction];
 
